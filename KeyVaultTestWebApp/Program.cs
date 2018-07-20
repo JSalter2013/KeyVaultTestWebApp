@@ -19,6 +19,21 @@ namespace KeyVaultTestWebApp
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                    .ConfigureAppConfiguration((context, config) =>
+                    {
+                        var builtConfig = config.Build();
+
+                        var keyVaultConfigBuilder = new ConfigurationBuilder();
+
+                        keyVaultConfigBuilder.AddAzureKeyVault(
+                            $"https://{builtConfig["Vault"]}.vault.azure.net/",
+                            builtConfig["ClientId"],
+                            builtConfig["ClientSecret"]);
+
+                        var keyVaultConfig = keyVaultConfigBuilder.Build();
+
+                        config.AddConfiguration(keyVaultConfig);
+                    })
                 .UseStartup<Startup>();
     }
 }
